@@ -34,6 +34,7 @@ const handleSubmit = async () => {
 
   try {
     await addDoc(collection(db, "hutang"), {
+		id,
       nama,
       noHp,
       jumlah: Number(jumlah),

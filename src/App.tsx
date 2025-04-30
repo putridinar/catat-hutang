@@ -1,8 +1,15 @@
-import { IonApp, IonRouterOutlet, IonSplitPane, setupIonicReact } from '@ionic/react';
+import {
+  IonApp,
+  IonSplitPane,
+  IonRouterOutlet,
+} from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useLocation } from 'react-router-dom';
 import Menu from './components/Menu';
 import Page from './pages/Page';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import { setupIonicReact } from '@ionic/react';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -36,17 +43,34 @@ import './theme/variables.css';
 
 setupIonicReact();
 
+
 const App: React.FC = () => {
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/login';
+
   return (
     <IonApp>
       <IonReactRouter>
         <IonSplitPane contentId="main">
-          <Menu />
+          {!isLoginPage && <Menu />}
           <IonRouterOutlet id="main">
-            <Route path="/" exact={true}>
-              <Redirect to="/folder/Inbox" />
+            <Route path="/login" exact>
+              <Login />
             </Route>
-            <Route path="/folder/:name" exact={true}>
+
+            <Route path="/dashboard" exact>
+              <Dashboard />
+            </Route>
+
+            <Route path="/page" exact>
+              <Page />
+            </Route>
+
+            <Route path="/" exact>
+              <Redirect to="/login" />
+            </Route>
+
+            <Route path="/folder/:name" exact>
               <Page />
             </Route>
           </IonRouterOutlet>
@@ -57,3 +81,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
