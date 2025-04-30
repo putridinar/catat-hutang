@@ -8,7 +8,9 @@ import { Redirect, Route, useLocation } from 'react-router-dom';
 import Menu from './components/Menu';
 import Page from './pages/Page';
 import Login from './pages/Login';
+import Logout from './pages/Logout';
 import Dashboard from './pages/Dashboard';
+import DetailHutang from './pages/DetailHutang';
 import { setupIonicReact } from '@ionic/react';
 
 /* Core CSS required for Ionic components to work properly */
@@ -62,6 +64,10 @@ const App: React.FC = () => {
               <Dashboard />
             </Route>
 
+			<Route path="/detail/:id" exact>
+			  <DetailHutang />
+			</Route>
+
             <Route path="/page" exact>
               <Page />
             </Route>
@@ -69,6 +75,10 @@ const App: React.FC = () => {
             <Route path="/" exact>
               <Redirect to="/login" />
             </Route>
+			
+			<Route path="/logout" exact>
+			  <Logout />
+			</Route>
 
             <Route path="/folder/:name" exact>
               <Page />
