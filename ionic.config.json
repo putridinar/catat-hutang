@@ -1,0 +1,8 @@
+{
+  "name": "Catat Hutang",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite",
+  "id": "d64d484e"
+}
