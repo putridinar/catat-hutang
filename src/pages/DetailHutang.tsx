@@ -1,9 +1,11 @@
 import {
-  IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonLabel, IonItem, IonCard,
+  IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonLabel, IonItem, IonCard, IonModal, IonInput,
   IonIcon, IonListHeader, IonBackButton, IonButton, IonButtons, IonSpinner, IonAlert, IonLoading,
-  IonNote
+  IonNote,
+  IonCardContent,
+  IonFooter
 } from '@ionic/react';
-import { logoWhatsapp } from 'ionicons/icons';
+import { logoWhatsapp, pencilSharp, trashSharp } from 'ionicons/icons';
 import { useParams, useHistory } from 'react-router';
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, doc, getDoc, deleteDoc, updateDoc, addDoc, Timestamp } from 'firebase/firestore';
@@ -18,9 +20,15 @@ const DetailHutang: React.FC = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [riwayat, setRiwayat] = useState<any[]>([]);
   const [showWaAlert, setShowWaAlert] = useState(false);
+  const [bayarAlert, setBayarAlert] = useState(false);
+  const [deleteUser, setDeleteAlert] = useState(false);
   const [loadingBayar, setLoadingBayar] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editNama, setEditNama] = useState('');
+  const [editJumlah, setEditJumlah] = useState(0);
+  const [editJatuhTempo, setEditJatuhTempo] = useState('');
   const user = getAuth().currentUser;
-  
+
 
 useEffect(() => {
   const fetchHistory = async () => {
@@ -47,14 +55,26 @@ useEffect(() => {
       const docRef = doc(db, 'hutang', id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        setData({ id: docSnap.id, ...docSnap.data() });
+        const docData = docSnap.data();
+        setData({ id: docSnap.id, ...docData });
+      
+        // 📝 Set nilai default untuk form edit
+        setEditNama(docData.nama || '');
+        setEditJumlah(parseInt(docData.jumlah) || 0);
+        if (docData.jatuhTempo?.toDate) {
+          setEditJatuhTempo(docData.jatuhTempo.toDate().toISOString().split('T')[0]);
+        }
       }
-      setLoading(false);
+            setLoading(false);
     };
     fetchData();
   }, [id]);
-
+  
   const handleBayarPenuh = async () => {
+    setBayarAlert(true);
+  };
+
+  const bayarPenuhSubmit = async () => {
     if (!data) return;
     setLoadingBayar(true);
   
@@ -75,7 +95,7 @@ useEffect(() => {
   
       history.push('/dashboard');
       setTimeout(() => {
-        window.location.reload();
+        window.location.href = '/dashboard';
       }, 100);
     } catch (err) {
       console.error('Gagal bayar penuh:', err);
@@ -130,6 +150,36 @@ useEffect(() => {
       setLoadingBayar(false);
     }
   };
+
+  const handleEditSubmit = async () => {
+    try {
+      await updateDoc(doc(db, 'hutang', id), {
+        nama: editNama,
+        jumlah: editJumlah,
+        jatuhTempo: new Date(editJatuhTempo),
+      });
+      alert('Hutang diperbarui!');
+      setShowEditModal(false);
+    } catch (err) {
+      console.error(err);
+      alert('Gagal update hutang');
+    }
+  };
+  
+  const handleDeleteAlert = async () => {
+    setDeleteAlert(true);
+  };
+
+  const handleDeleteSubmit = async () => {
+    try {
+      await deleteDoc(doc(db, 'hutang', id));
+      alert('Hutang berhasil dihapus!');
+      history.push('/dashboard');
+    } catch (err) {
+      console.error('Gagal hapus hutang:', err);
+      alert('Gagal hapus hutang!');
+    }
+  };
   
   const handleKirimWhatsapp = () => {
     if (!data) return;
@@ -179,6 +229,16 @@ useEffect(() => {
 				<p style={{ margin: '4px 0' }}>📱 <strong>Nomor HP:</strong> {data.noHp}</p>
 				<p style={{ margin: '4px 0' }}>📝 <strong>Catatan:</strong> {data.catatan || '-'}</p>
 			  </IonLabel>
+        <IonButtons slot="end">
+        <IonButton color="warning" onClick={() => setShowEditModal(true)} title="Edit Hutang">
+        <IonIcon slot="icon-only" icon={pencilSharp} />
+        </IonButton>
+        </IonButtons>
+        <IonButtons slot="end">
+            <IonButton color="danger" onClick={handleDeleteAlert} title="Hapus Hutang">
+                <IonIcon slot="icon-only" icon={trashSharp} />
+            </IonButton>
+        </IonButtons>
 			</IonItem>
 
 			<div style={{ display: 'flex', gap: '12px', flexDirection: 'column', marginTop: '20px' }}>
@@ -214,6 +274,30 @@ useEffect(() => {
       </IonCard>
 		  ))
 		)}
+    <IonModal isOpen={showEditModal} onDidDismiss={() => setShowEditModal(false)}>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Edit Hutang {data.nama}</IonTitle>
+                  <IonButtons slot="end">
+                    <IonButton onClick={() => setShowEditModal(false)}>Cancel</IonButton>
+                  </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent>
+        <IonCard>
+          <IonCardContent>
+              <IonInput label="Nama" labelPlacement="fixed" placeholder="Edit Nama" value={editNama} onIonChange={e => setEditNama(e.detail.value!)} />
+              <IonInput label="Edit Jumlah" type="number" labelPlacement="fixed" placeholder="Edit Jumlah Hutang" value={editJumlah} onIonChange={e => setEditJumlah(parseInt(e.detail.value!))} />
+              <IonInput label="Jatuh Tempo" type="date" labelPlacement="fixed" placeholder="Edit Jatuh tempo" value={editJatuhTempo} onIonChange={e => setEditJatuhTempo(e.detail.value!)} />
+          </IonCardContent>
+          <IonFooter>
+            <IonToolbar className='ion-padding'>
+              <IonButton expand="block" onClick={handleEditSubmit}>Simpan</IonButton>
+            </IonToolbar>
+          </IonFooter>
+        </IonCard>
+      </IonContent>
+    </IonModal>    
           </>
         )}
         <IonAlert
@@ -238,7 +322,45 @@ useEffect(() => {
             },
           ]}
         />
+        <IonAlert
+        isOpen={deleteUser}
+        header="Konfirmasi"
+        message="Apakah kamu yakin ingin menghapusnya?"
+        buttons={[
+          {
+            text: 'Batal',
+            role: 'cancel',
+            handler: () => setDeleteAlert(false),
+          },
+          {
+            text: 'Yakin',
+            handler: () => {
+              setDeleteAlert(false);
+              handleDeleteSubmit();
+            },
+          },
+        ]}
+      />
       </IonContent>
+<IonAlert
+  isOpen={bayarAlert}
+  header="Konfirmasi"
+  message="Apakah yang bersangkutan sudah membayar sepenuhnya?"
+  buttons={[
+    {
+      text: 'Belum',
+      role: 'cancel',
+      handler: () => setBayarAlert(false),
+    },
+    {
+      text: 'Sudah',
+      handler: () => {
+        setBayarAlert(false);
+        bayarPenuhSubmit();
+      },
+    },
+  ]}
+/>
 <IonAlert
   isOpen={showWaAlert}
   header="Konfirmasi"
@@ -253,7 +375,7 @@ useEffect(() => {
       text: 'Kirim',
       handler: () => {
         setShowWaAlert(false);
-        handleKirimWhatsapp(); // kirim pesan
+        handleKirimWhatsapp();
       },
     },
   ]}
@@ -268,3 +390,7 @@ useEffect(() => {
 };
 
 export default DetailHutang;
+function setDeleteAlert(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+

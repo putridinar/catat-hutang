@@ -8,7 +8,7 @@ import { Redirect, Route, useLocation } from 'react-router-dom';
 import Menu from './components/Menu';
 import Page from './pages/Page';
 import Profile from './pages/Profile';
-import Riwayat from './pages/RiwayatTransaksi';
+import RiwayatTransaksi from './pages/RiwayatTransaksi';
 import Login from './pages/Login';
 import Logout from './pages/Logout';
 import PrivateRoute from './components/PrivateRoute';
@@ -45,7 +45,6 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import RiwayatTransaksi from './pages/RiwayatTransaksi';
 
 setupIonicReact();
 interface MenuProps {

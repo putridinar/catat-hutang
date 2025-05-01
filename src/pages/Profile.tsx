@@ -8,10 +8,12 @@ import {
   import { useEffect, useState } from 'react';
   import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
   import { useHistory } from 'react-router';
+  import { useToast } from '../contexts/useToast';
   
   const Profile: React.FC = () => {
     const [user, setUser] = useState<any>(null);
     const history = useHistory();
+      const { show } = useToast();
   
     useEffect(() => {
       const auth = getAuth();
@@ -26,7 +28,10 @@ import {
       await signOut(auth);
       localStorage.removeItem('uid');
       localStorage.removeItem('isLoggedIn');
-      history.push('/login');
+      show('Logout berhasil!', 'success');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000); // beri delay biar toast sempat tampil
     };
   
     return (
