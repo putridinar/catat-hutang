@@ -41,9 +41,26 @@ const PiutangList: React.FC<Props> = ({ data }) => {
             <p style={{ margin: '2px 0', color: '#666' }}>
               📅 <strong>Tanggal:</strong> {new Date(item.tanggal).toLocaleDateString('id-ID')}
             </p>
-            <p style={{ margin: '2px 0', color: '#666' }}>
-              💥 <strong>Tempo:</strong> {new Date(item.jatuhTempo).toLocaleDateString('id-ID')}
-            </p>
+            
+              <p style={{ margin: '2px 0', color: '#666' }}>
+                💥 <strong>Tempo:</strong>{' '}
+                {(() => {
+                  const tempo = item.jatuhTempo;
+                  let tanggal: Date | null = null;
+
+                  if (tempo?.toDate) {
+                    // Firebase Timestamp
+                    tanggal = tempo.toDate();
+                  } else if (typeof tempo === 'string') {
+                    tanggal = new Date(tempo);
+                  }
+
+                  return tanggal && !isNaN(tanggal.getTime())
+                    ? tanggal.toLocaleDateString('id-ID')
+                    : 'Tanggal tidak valid';
+                })()}
+              </p>
+
           </IonLabel>
           <IonIcon icon={chevronForward} slot="end" color="medium" />
         </IonItem>

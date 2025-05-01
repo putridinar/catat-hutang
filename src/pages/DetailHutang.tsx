@@ -61,10 +61,20 @@ useEffect(() => {
         // 📝 Set nilai default untuk form edit
         setEditNama(docData.nama || '');
         setEditJumlah(parseInt(docData.jumlah) || 0);
-        if (docData.jatuhTempo?.toDate) {
-          setEditJatuhTempo(docData.jatuhTempo.toDate().toISOString().split('T')[0]);
+        if (docData.jatuhTempo instanceof Timestamp) {
+          const date = docData.jatuhTempo.toDate();
+          setEditJatuhTempo(date.toISOString().split('T')[0]);
+        } else if (typeof docData.jatuhTempo === 'string') {
+          const parsedDate = new Date(docData.jatuhTempo);
+          if (!isNaN(parsedDate.getTime())) {
+            setEditJatuhTempo(parsedDate.toISOString().split('T')[0]);
+          } else {
+            setEditJatuhTempo('');
+          }
+        } else {
+          setEditJatuhTempo('');
         }
-      }
+              }
             setLoading(false);
     };
     fetchData();
@@ -156,7 +166,7 @@ useEffect(() => {
       await updateDoc(doc(db, 'hutang', id), {
         nama: editNama,
         jumlah: editJumlah,
-        jatuhTempo: new Date(editJatuhTempo),
+        jatuhTempo: Timestamp.fromDate(new Date(editJatuhTempo)),
       });
       alert('Hutang diperbarui!');
       setShowEditModal(false);
