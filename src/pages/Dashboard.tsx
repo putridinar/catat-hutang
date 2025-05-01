@@ -25,7 +25,8 @@ const Dashboard: React.FC = () => {
   const [piutangList, setPiutangList] = useState<Piutang[]>([]);
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
-  const modal = useRef<HTMLIonModalElement>(null);
+  const modalRef = useRef<HTMLIonModalElement>(null!);
+
 
   // Form state
   const [nama, setNama] = useState('');
@@ -68,7 +69,7 @@ const Dashboard: React.FC = () => {
         catatan,
         noHp,
       });
-      modal.current?.dismiss();
+      modalRef.current?.dismiss();
       await fetchPiutang();
       setNama('');
       setJumlah('');
@@ -101,7 +102,7 @@ const Dashboard: React.FC = () => {
 
       <IonContent className="ion-padding">
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => modal.current?.present()}>
+          <IonFabButton onClick={() => modalRef.current?.present()}>
             <IonIcon icon={add}></IonIcon>
           </IonFabButton>
         </IonFab>
@@ -124,7 +125,7 @@ const Dashboard: React.FC = () => {
         )}
 
         <TambahModal
-          modalRef={modal}
+          modalRef={modalRef}
           nama={nama} setNama={setNama}
           noHp={noHp} setNoHp={setNoHp}
           jumlah={jumlah} setJumlah={setJumlah}

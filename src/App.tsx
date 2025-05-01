@@ -45,45 +45,47 @@ import '@ionic/react/css/palettes/dark.system.css';
 import './theme/variables.css';
 
 setupIonicReact();
+interface MenuProps {
+  className?: string;
+  style?: React.CSSProperties;
+}
 
-
-const App: React.FC = () => {
+const App: React.FC<MenuProps> = ({ className, style }) => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/login';
 
   return (
-    <IonApp>
-      <IonReactRouter>
-        <IonSplitPane contentId="main">
-          {!isLoginPage && <Menu className={isLoginPage ? 'hidden' : ''} />}
-          <IonRouterOutlet id="main">
-            <Route path="/login" exact>
-              <Login style={{ minWidth: '100vw', width: '100%' }} />
-            </Route>
+    <div className={className} style={style}>
+      <IonApp>
+        <IonReactRouter>
+          <IonSplitPane contentId="main">
+            {!isLoginPage && <Menu className={isLoginPage ? 'hidden' : ''} />}
+            <IonRouterOutlet id="main">
+              <Route path="/login" exact>
+                <Login style={{ minWidth: '100vw', width: '100%' }} />
+              </Route>
 
-            <PrivateRoute path="/dashboard" component={Dashboard} />
+              <PrivateRoute path="/dashboard" component={Dashboard} />
+              <PrivateRoute path="/detail/:id" component={DetailHutang} />
+              <PrivateRoute path="/page" component={Page} />
 
-            <PrivateRoute path="/detail/:id" component={DetailHutang} />
+              <Route path="/" exact>
+                <Redirect to="/login" />
+              </Route>
 
-            <PrivateRoute path="/page" component={Page} />
+              <Route path="/logout" exact>
+                <Logout />
+              </Route>
 
-            <Route path="/" exact>
-              <Redirect to="/login" />
-            </Route>
-			
-			<Route path="/logout" exact>
-			  <Logout />
-			</Route>
-
-            <Route path="/folder/:name" exact>
-              <Page />
-            </Route>
-          </IonRouterOutlet>
-        </IonSplitPane>
-      </IonReactRouter>
-    </IonApp>
+              <Route path="/folder/:name" exact>
+                <Page />
+              </Route>
+            </IonRouterOutlet>
+          </IonSplitPane>
+        </IonReactRouter>
+      </IonApp>
+    </div>
   );
 };
 
 export default App;
-

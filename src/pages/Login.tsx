@@ -10,7 +10,11 @@ import { useHistory } from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import '../theme/Login.css';
 
-const Login: React.FC = () => {
+interface LoginProps {
+  style?: React.CSSProperties;
+}
+
+const Login: React.FC<LoginProps> = ({ style }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,7 +57,7 @@ const Login: React.FC = () => {
   };  
 
   return (
-    <IonPage>
+    <IonPage style={style}>
       <IonContent className="login-background" fullscreen>
         <div className="login-container">
           <img src="/sari.png" alt="Logo" className="login-logo" />

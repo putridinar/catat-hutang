@@ -41,7 +41,11 @@ const appPages: AppPage[] = [
   },
 ];
 
-const Menu: React.FC = () => {
+interface MenuProps {
+  className?: string;
+}
+
+const Menu: React.FC<MenuProps> = ({ className }) => {
   const location = useLocation();
   const { show } = useToast(); // aman karena tidak dipanggil saat render
 
@@ -55,7 +59,7 @@ const Menu: React.FC = () => {
   };
 
   return (
-    <IonMenu contentId="main" type="overlay">
+    <IonMenu className={className} contentId="main" type="overlay">
       <IonContent>
         <IonList id="menu-list">
           <IonListHeader>Menu</IonListHeader>

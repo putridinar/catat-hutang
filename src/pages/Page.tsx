@@ -94,8 +94,8 @@ const handleSubmit = async () => {
             id="selectTanggal"
             presentation="date"
             value={tanggal}
-            onIonChange={(e) => setTanggal(e.detail.value!)}
-          />
+            onIonChange={(e) => setTanggal(e.detail.value as string)}
+            />
         </IonModal>
 
         <IonButton expand="block" className="ion-margin-top" onClick={handleSubmit}>
