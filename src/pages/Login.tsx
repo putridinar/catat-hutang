@@ -3,11 +3,9 @@ import {
   IonItem, IonLabel, IonLoading, IonToast, IonIcon
 } from '@ionic/react';
 import { logInOutline } from 'ionicons/icons';
-import { logoGoogle } from 'ionicons/icons';
 import { useState } from 'react';
 import { auth, provider } from '../firebase';
 import { useHistory } from 'react-router-dom';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import '../theme/Login.css';
 
 interface LoginProps {
@@ -20,23 +18,6 @@ const Login: React.FC<LoginProps> = ({ style }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const history = useHistory();
-
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-  
-      // Set token login
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', user.email || '');
-  
-      // Redirect ke dashboard
-      window.location.href = '/dashboard';
-    } catch (error) {
-      console.error('Login Google gagal', error);
-    }
-  };
   
   const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
   const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
@@ -46,6 +27,7 @@ const Login: React.FC<LoginProps> = ({ style }) => {
     try {
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         window.location.href = '/dashboard';
+		localStorage.setItem('isLoggedIn', 'true');
       } else {
         throw new Error('Email atau password salah');
       }
@@ -84,14 +66,9 @@ const Login: React.FC<LoginProps> = ({ style }) => {
             <IonIcon icon={logInOutline} slot="start" />
             Login Email
           </IonButton>
-		  <IonText>Atau</IonText>
-      <IonButton expand="block" onClick={handleGoogleLogin} color='primary'>
-            <IonIcon icon={logoGoogle} slot="start" />
-        Login dengan Google
-      </IonButton>
 
           <IonText color="medium" className="login-footer">
-            v1.0 - Aplikasi Piutang Ayah
+            v1.0 - Aplikasi Ayah
           </IonText>
         </div>
 
