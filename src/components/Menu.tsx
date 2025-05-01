@@ -1,5 +1,6 @@
 import {
   IonContent,
+  IonFooter,
   IonIcon,
   IonItem,
   IonLabel,
@@ -7,13 +8,16 @@ import {
   IonListHeader,
   IonMenu,
   IonMenuToggle,
+  IonToolbar,
 } from '@ionic/react';
-import { useToast } from '../useToast';
+import { useToast } from '../contexts/useToast';
 import { useLocation } from 'react-router-dom';
 import {
-  logOutOutline, logOutSharp,
-  clipboardOutline, clipboardSharp
+  logOutOutline, logOutSharp, personOutline, personSharp,
+  clipboardOutline, clipboardSharp, barChartOutline, barChartSharp
 } from 'ionicons/icons';
+import UserProfileItem from '../components/UserProfileItem';
+import TotalAsetCard from '../components/TotalAsetCard';
 
 import './Menu.css';
 
@@ -33,6 +37,18 @@ const appPages: AppPage[] = [
     mdIcon: clipboardSharp,
   },
   {
+    title: 'Profile',
+    url: '/profile',
+    iosIcon: personOutline,
+    mdIcon: personSharp,
+  },
+  {
+    title: 'Riwayat Transaksi',
+    url: '/riwayat',
+    iosIcon: barChartOutline,
+    mdIcon: barChartSharp,
+  },
+  {
     title: 'Logout',
     url: '',
     iosIcon: logOutOutline,
@@ -47,12 +63,12 @@ interface MenuProps {
 
 const Menu: React.FC<MenuProps> = ({ className }) => {
   const location = useLocation();
-  const { show } = useToast(); // aman karena tidak dipanggil saat render
+  const { show } = useToast();
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userEmail');
-    show('Logout berhasil!', 'success'); // panggil toast
+    show('Logout berhasil!', 'success');
     setTimeout(() => {
       window.location.href = '/login';
     }, 1000); // beri delay biar toast sempat tampil
@@ -61,6 +77,7 @@ const Menu: React.FC<MenuProps> = ({ className }) => {
   return (
     <IonMenu className={className} contentId="main" type="overlay">
       <IonContent>
+      <UserProfileItem />
         <IonList id="menu-list">
           <IonListHeader>Menu</IonListHeader>
 
@@ -88,6 +105,11 @@ const Menu: React.FC<MenuProps> = ({ className }) => {
             </IonMenuToggle>
           ))}
         </IonList>
+        <IonFooter>
+          <IonToolbar>
+          <TotalAsetCard />
+        </IonToolbar>
+        </IonFooter>
       </IonContent>
     </IonMenu>
   );

@@ -8,7 +8,7 @@ interface Props {
     id: string;
     nama: string;
     jumlah: string;
-    tanggal: string; // asumsi: ISO string dari Firestore
+    tanggal: string;
   }[];
 }
 

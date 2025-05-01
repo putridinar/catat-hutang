@@ -5,8 +5,9 @@ import {
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import { useEffect, useState, useRef } from 'react';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { useToast } from '../contexts/useToast';
 import TotalHutang from '../components/TotalHutang';
 import TotalKasMasuk from '../components/TotalKasMasuk';
 import PiutangList from '../components/PiutangList';
@@ -38,8 +39,15 @@ const Dashboard: React.FC = () => {
   const fetchPiutang = async () => {
     setLoading(true);
     try {
-      const snapshot = await getDocs(collection(db, 'hutang'));
-      const data = snapshot.docs.map((doc) => ({
+      const uid = localStorage.getItem('uid');
+      if (!uid) {
+        console.warn('UID tidak ditemukan');
+        return;
+      }
+  
+      const q = query(collection(db, 'hutang'), where('uid', '==', uid));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...(doc.data() as Omit<Piutang, 'id'>),
       }));
@@ -50,7 +58,7 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchPiutang();
   }, []);
@@ -68,6 +76,7 @@ const Dashboard: React.FC = () => {
         tanggal,
         catatan,
         noHp,
+        uid: localStorage.getItem('uid')
       });
       modalRef.current?.dismiss();
       await fetchPiutang();
@@ -86,7 +95,7 @@ const Dashboard: React.FC = () => {
     setShowToast(true);
     setTimeout(() => {
       window.location.href = '/login';
-    }, 1500); // delay biar toast sempat tampil
+    }, 1500);
   };
 
   return (

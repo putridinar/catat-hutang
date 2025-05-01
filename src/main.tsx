@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { setupIonicReact } from '@ionic/react';
 import { IonApp } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ToastProvider } from './useToast';
+import { ToastProvider } from './contexts/useToast';
 import App from './App';
 
 

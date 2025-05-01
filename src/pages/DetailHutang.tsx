@@ -1,6 +1,6 @@
 import {
-  IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonLabel, IonItem,
-  IonIcon, IonListHeader, IonBackButton, IonButton, IonButtons, IonSpinner, IonAlert
+  IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonLabel, IonItem, IonCard,
+  IonIcon, IonListHeader, IonBackButton, IonButton, IonButtons, IonSpinner, IonAlert, IonLoading
 } from '@ionic/react';
 import { logoWhatsapp } from 'ionicons/icons';
 import { useParams, useHistory } from 'react-router';
@@ -16,6 +16,8 @@ const DetailHutang: React.FC = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [riwayat, setRiwayat] = useState<any[]>([]);
   const [showWaAlert, setShowWaAlert] = useState(false);
+  const [loadingBayar, setLoadingBayar] = useState(false);
+
 
 useEffect(() => {
   const fetchHistory = async () => {
@@ -51,48 +53,69 @@ useEffect(() => {
 
   const handleBayarPenuh = async () => {
     if (!data) return;
-    // Simpan ke kas masuk (implementasikan koleksi 'kasMasuk')
-    await addDoc(collection(db, 'kasMasuk'), {
-      nama: data.nama,
-      jumlah: data.jumlah,
-      tanggal:  Timestamp.now(),
-      keterangan: 'Bayar penuh'
-    });
-    await deleteDoc(doc(db, 'hutang', id));
-    history.push('/dashboard');
+    setLoadingBayar(true);
+  
+    try {
+      await addDoc(collection(db, 'kasMasuk'), {
+        nama: data.nama,
+        jumlah: data.jumlah,
+        tanggal: Timestamp.now(),
+        keterangan: 'Bayar penuh'
+      });
+  
+      await deleteDoc(doc(db, 'hutang', id));
+  
+      history.push('/dashboard');
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (err) {
+      console.error('Gagal bayar penuh:', err);
+    } finally {
+      setLoadingBayar(false);
+    }
   };
-
+  
   const handleBayarCicil = async () => {
     setShowAlert(true);
   };
 
   const handleCicilSubmit = async (jumlahCicilan: number) => {
     if (!data) return;
-    const sisa = parseInt(data.jumlah) - jumlahCicilan;
-
-    // Masukkan cicilan ke kasMasuk
-    await addDoc(collection(db, 'kasMasuk'), {
-      nama: data.nama,
-      jumlah: jumlahCicilan,
-      tanggal:  Timestamp.now(),
-      keterangan: 'Cicilan'
-    });
-	
-	await addDoc(collection(db, `hutang/${id}/pembayaran`), {
-	  jumlah: jumlahCicilan,
-	  tanggal:  Timestamp.now(),
-	  metode: 'Cicilan'
-	});
-
-    // Update hutang
-    await updateDoc(doc(db, 'hutang', id), {
-      jumlah: sisa.toString()
-    });
-
-    setShowAlert(false);
-    history.push('/dashboard');
+    setLoadingBayar(true);
+  
+    try {
+      const sisa = parseInt(data.jumlah) - jumlahCicilan;
+  
+      await addDoc(collection(db, 'kasMasuk'), {
+        nama: data.nama,
+        jumlah: jumlahCicilan,
+        tanggal: Timestamp.now(),
+        keterangan: 'Cicilan'
+      });
+  
+      await addDoc(collection(db, `hutang/${id}/pembayaran`), {
+        jumlah: jumlahCicilan,
+        tanggal: Timestamp.now(),
+        metode: 'Cicilan'
+      });
+  
+      await updateDoc(doc(db, 'hutang', id), {
+        jumlah: sisa.toString()
+      });
+  
+      setShowAlert(false);
+      history.push('/dashboard');
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (err) {
+      console.error('Gagal bayar cicil:', err);
+    } finally {
+      setLoadingBayar(false);
+    }
   };
-
+  
   const handleKirimWhatsapp = () => {
     if (!data) return;
   
@@ -124,8 +147,12 @@ useEffect(() => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40%' }}>
+        {loading ? (            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%',
+            }}>
             <IonSpinner name="crescent" />
           </div>
         ) : (
@@ -157,16 +184,19 @@ useEffect(() => {
 		  </IonItem>
 		) : (
 		  riwayat.map((item, idx) => (
+                  <IonCard>
 			<IonItem color="tertiary" key={idx} lines="full">
 			  <IonLabel>
 				<h2 style={{ fontSize: '1rem', margin: 0 }}>Rp {parseInt(item.jumlah).toLocaleString('id-ID')}</h2>
-				<p style={{ fontSize: '0.8rem', color: '#666' }}>
+        <br/>
+				<p style={{ fontSize: '0.8rem', color: '#fff' }}>
 				  {item.tanggal && item.tanggal.toDate
 					? item.tanggal.toDate().toLocaleDateString('id-ID')
 					: 'Tanggal tidak valid'}
 				</p>
 			  </IonLabel>
 			</IonItem>
+      </IonCard>
 		  ))
 		)}
           </>
@@ -212,6 +242,11 @@ useEffect(() => {
       },
     },
   ]}
+/>
+<IonLoading
+  isOpen={loadingBayar}
+  message="Memproses pembayaran..."
+  spinner="crescent"
 />
     </IonPage>
   );

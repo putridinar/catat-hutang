@@ -49,7 +49,7 @@ const TambahModal: React.FC<Props> = ({
 </IonItem>
 
 <IonItem lines="none" style={{ '--background': 'transparent', overflow: 'visible', marginBottom: '20px' }}>
-  <IonLabel position="stacked">Tanggal</IonLabel>
+  <IonLabel position="stacked">Jatuh Tempo</IonLabel>
   <input
     type="date"
     value={tanggal}
@@ -58,6 +58,7 @@ const TambahModal: React.FC<Props> = ({
       marginTop: '8px',
       padding: '12px',
       width: '100%',
+      minHeight: '56px',
       borderRadius: '3px',
       border: '1px solid #595959',
       background: 'inherit'

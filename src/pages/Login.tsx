@@ -3,9 +3,12 @@ import {
   IonItem, IonLabel, IonLoading, IonToast, IonIcon
 } from '@ionic/react';
 import { logInOutline } from 'ionicons/icons';
+import { logoGoogle } from 'ionicons/icons';
 import { useState } from 'react';
+import { useToast } from '../contexts/useToast';
 import { auth, provider } from '../firebase';
 import { useHistory } from 'react-router-dom';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import '../theme/Login.css';
 
 interface LoginProps {
@@ -18,6 +21,23 @@ const Login: React.FC<LoginProps> = ({ style }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const history = useHistory();
+  const { show } = useToast();
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+  
+      if (user) {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('uid', user.uid); // simpan UID
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      show('Login Error!', 'danger');
+    }
+  };
   
   const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
   const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
@@ -66,9 +86,14 @@ const Login: React.FC<LoginProps> = ({ style }) => {
             <IonIcon icon={logInOutline} slot="start" />
             Login Email
           </IonButton>
+		   <IonText>Atau</IonText>
+      <IonButton expand="block" onClick={handleGoogleLogin} color='primary'>
+            <IonIcon icon={logoGoogle} slot="start" />
+        Login dengan Google
+      </IonButton>
 
           <IonText color="medium" className="login-footer">
-            v1.0 - Aplikasi Ayah
+            v1.0 - Aplikasi Piutang Ayah
           </IonText>
         </div>
 
