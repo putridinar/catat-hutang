@@ -15,6 +15,8 @@ interface Props {
   setJumlah: (val: string) => void;
   tanggal: string;
   setTanggal: (val: string) => void;
+  jatuhTempo: string;
+  setJatuhTempo: (val: string) => void;
   catatan: string;
   setCatatan: (val: string) => void;
   onSubmit: () => void;
@@ -22,7 +24,7 @@ interface Props {
 
 const TambahModal: React.FC<Props> = ({
   modalRef, nama, setNama, noHp, setNoHp, jumlah, setJumlah,
-  tanggal, setTanggal, catatan, setCatatan, onSubmit
+  tanggal, setTanggal, jatuhTempo, setJatuhTempo, catatan, setCatatan, onSubmit
 }) => {
   return (
     <IonModal ref={modalRef}>
@@ -49,11 +51,29 @@ const TambahModal: React.FC<Props> = ({
 </IonItem>
 
 <IonItem lines="none" style={{ '--background': 'transparent', overflow: 'visible', marginBottom: '20px' }}>
-  <IonLabel position="stacked">Jatuh Tempo</IonLabel>
+  <IonLabel position="stacked">Tanggal pinjam</IonLabel>
   <input
     type="date"
     value={tanggal}
     onChange={(e) => setTanggal(e.target.value)}
+    style={{
+      marginTop: '8px',
+      padding: '12px',
+      width: '100%',
+      minHeight: '56px',
+      borderRadius: '3px',
+      border: '1px solid #595959',
+      background: 'inherit'
+    }}
+  />
+</IonItem>
+
+<IonItem lines="none" style={{ '--background': 'transparent', overflow: 'visible', marginBottom: '20px' }}>
+  <IonLabel position="stacked">Jatuh Tempo</IonLabel>
+  <input
+    type="date"
+    value={jatuhTempo}
+    onChange={(e) => setJatuhTempo(e.target.value)}
     style={{
       marginTop: '8px',
       padding: '12px',

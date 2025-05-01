@@ -1,11 +1,13 @@
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonLabel, IonItem, IonCard,
-  IonIcon, IonListHeader, IonBackButton, IonButton, IonButtons, IonSpinner, IonAlert, IonLoading
+  IonIcon, IonListHeader, IonBackButton, IonButton, IonButtons, IonSpinner, IonAlert, IonLoading,
+  IonNote
 } from '@ionic/react';
 import { logoWhatsapp } from 'ionicons/icons';
 import { useParams, useHistory } from 'react-router';
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, doc, getDoc, deleteDoc, updateDoc, addDoc, Timestamp } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { db } from '../firebase';
 
 const DetailHutang: React.FC = () => {
@@ -17,7 +19,8 @@ const DetailHutang: React.FC = () => {
   const [riwayat, setRiwayat] = useState<any[]>([]);
   const [showWaAlert, setShowWaAlert] = useState(false);
   const [loadingBayar, setLoadingBayar] = useState(false);
-
+  const user = getAuth().currentUser;
+  
 
 useEffect(() => {
   const fetchHistory = async () => {
@@ -56,10 +59,15 @@ useEffect(() => {
     setLoadingBayar(true);
   
     try {
+      const user = getAuth().currentUser;
+      if (!user) return;
+  
       await addDoc(collection(db, 'kasMasuk'), {
+        uid: user.uid,
         nama: data.nama,
         jumlah: data.jumlah,
         tanggal: Timestamp.now(),
+        jatuhTempo: Timestamp.now(),
         keterangan: 'Bayar penuh'
       });
   
@@ -85,23 +93,30 @@ useEffect(() => {
     setLoadingBayar(true);
   
     try {
-      const sisa = parseInt(data.jumlah) - jumlahCicilan;
+      const user = getAuth().currentUser;
+      if (!user) return;
+  
+      const sisa = data.jumlah - jumlahCicilan;
   
       await addDoc(collection(db, 'kasMasuk'), {
+        uid: user.uid,
         nama: data.nama,
         jumlah: jumlahCicilan,
         tanggal: Timestamp.now(),
+        jatuhTempo: Timestamp.now(),
         keterangan: 'Cicilan'
       });
   
       await addDoc(collection(db, `hutang/${id}/pembayaran`), {
+        uid: user.uid,
         jumlah: jumlahCicilan,
         tanggal: Timestamp.now(),
+        jatuhTempo: Timestamp.now(),
         metode: 'Cicilan'
       });
   
       await updateDoc(doc(db, 'hutang', id), {
-        jumlah: sisa.toString()
+        jumlah: sisa
       });
   
       setShowAlert(false);
@@ -185,15 +200,15 @@ useEffect(() => {
 		) : (
 		  riwayat.map((item, idx) => (
                   <IonCard>
-			<IonItem color="tertiary" key={idx} lines="full">
+			<IonItem color="light" key={idx} lines="full">
 			  <IonLabel>
-				<h2 style={{ fontSize: '1rem', margin: 0 }}>Rp {parseInt(item.jumlah).toLocaleString('id-ID')}</h2>
+				<h2 style={{ fontSize: '1rem', margin: 0 }}>Bayar Rp {parseInt(item.jumlah).toLocaleString('id-ID')}</h2>
         <br/>
-				<p style={{ fontSize: '0.8rem', color: '#fff' }}>
+				<p style={{ fontSize: '0.8rem', color: '#fff' }}><IonNote>Tanggal -   
 				  {item.tanggal && item.tanggal.toDate
 					? item.tanggal.toDate().toLocaleDateString('id-ID')
 					: 'Tanggal tidak valid'}
-				</p>
+				</IonNote></p>
 			  </IonLabel>
 			</IonItem>
       </IonCard>

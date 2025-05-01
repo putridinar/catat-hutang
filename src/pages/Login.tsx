@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useToast } from '../contexts/useToast';
 import { auth, provider } from '../firebase';
 import { useHistory } from 'react-router-dom';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, signInWithPopup, signInWithEmailAndPassword, GoogleAuthProvider } from 'firebase/auth';
 import '../theme/Login.css';
 
 interface LoginProps {
@@ -30,7 +30,7 @@ const Login: React.FC<LoginProps> = ({ style }) => {
   
       if (user) {
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('uid', user.uid); // simpan UID
+        localStorage.setItem('uid', user.uid);
         window.location.href = '/dashboard';
       }
     } catch (err) {
@@ -44,15 +44,21 @@ const Login: React.FC<LoginProps> = ({ style }) => {
   
   const handleLogin = async () => {
     setLoading(true);
+    setError('');
+    const auth = getAuth();
+  
     try {
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        window.location.href = '/dashboard';
-		localStorage.setItem('isLoggedIn', 'true');
-      } else {
-        throw new Error('Email atau password salah');
-      }
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Simpan status login (opsional)
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('uid', user.uid);
+  
+      // Redirect ke dashboard
+      window.location.href = '/dashboard';
     } catch (err: any) {
-      setError(err.message);
+      setError('Email atau password salah');
     } finally {
       setLoading(false);
     }

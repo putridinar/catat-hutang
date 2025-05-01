@@ -46,7 +46,7 @@ import {
           />
         </IonAvatar>
         <IonLabel>
-          <h2>{user.displayName || 'Pengguna'}</h2>
+          <h2>{user.displayName || 'Admin'}</h2>
           <p>{user.email}</p>
         </IonLabel>
       </IonItem>

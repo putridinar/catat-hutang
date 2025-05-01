@@ -1,7 +1,7 @@
-// src/components/TotalAsetCard.tsx
 import { useEffect, useState } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonText } from '@ionic/react';
 
 const TotalAsetCard: React.FC = () => {
@@ -10,27 +10,38 @@ const TotalAsetCard: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribeKas = onSnapshot(collection(db, 'kasMasuk'), (snapshot) => {
-      const total = snapshot.docs.reduce((acc, doc) => {
-        const data = doc.data();
-        return acc + parseInt(data.jumlah || '0');
-      }, 0);
-      setKasMasuk(total);
+    const unsubscribeAuth = onAuthStateChanged(getAuth(), (user) => {
+      if (!user) return;
+  
+      const qKas = query(collection(db, 'kasMasuk'), where('uid', '==', user.uid));
+      const qHutang = query(collection(db, 'hutang'), where('uid', '==', user.uid));
+  
+      const unsubscribeKas = onSnapshot(qKas, (snapshot) => {
+        const total = snapshot.docs.reduce((acc, doc) => {
+          const data = doc.data();
+          return acc + parseInt(data.jumlah || '0');
+        }, 0);
+        setKasMasuk(total);
+      });
+  
+      const unsubscribePiutang = onSnapshot(qHutang, (snapshot) => {
+        const total = snapshot.docs.reduce((acc, doc) => {
+          const data = doc.data();
+          return acc + parseInt(data.jumlah || '0');
+        }, 0);
+        setPiutang(total);
+        setLoading(false);
+      });
+  
+      // Cleanup snapshot
+      return () => {
+        unsubscribeKas();
+        unsubscribePiutang();
+      };
     });
-
-    const unsubscribePiutang = onSnapshot(collection(db, 'hutang'), (snapshot) => {
-      const total = snapshot.docs.reduce((acc, doc) => {
-        const data = doc.data();
-        return acc + parseInt(data.jumlah || '0');
-      }, 0);
-      setPiutang(total);
-      setLoading(false); // selesai loading pas piutang masuk (terakhir)
-    });
-
-    return () => {
-      unsubscribeKas();
-      unsubscribePiutang();
-    };
+  
+    // Cleanup auth listener
+    return () => unsubscribeAuth();
   }, []);
 
   const totalAset = kasMasuk + piutang;

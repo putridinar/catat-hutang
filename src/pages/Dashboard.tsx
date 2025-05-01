@@ -18,6 +18,7 @@ interface Piutang {
   nama: string;
   jumlah: string;
   tanggal: string;
+  jatuhTempo: string;
   catatan?: string;
   noHp?: string;
 }
@@ -33,6 +34,7 @@ const Dashboard: React.FC = () => {
   const [nama, setNama] = useState('');
   const [jumlah, setJumlah] = useState('');
   const [tanggal, setTanggal] = useState('');
+  const [jatuhTempo, setJatuhTempo] = useState('');
   const [catatan, setCatatan] = useState('');
   const [noHp, setNoHp] = useState('');
 
@@ -64,7 +66,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const handleSubmit = async () => {
-    if (!nama || !noHp || !jumlah || !tanggal) {
+    if (!nama || !noHp || !jumlah || !tanggal || !jatuhTempo) {
       setShowToast(true);
       return;
     }
@@ -74,6 +76,7 @@ const Dashboard: React.FC = () => {
         nama,
         jumlah,
         tanggal,
+        jatuhTempo,
         catatan,
         noHp,
         uid: localStorage.getItem('uid')
@@ -83,6 +86,7 @@ const Dashboard: React.FC = () => {
       setNama('');
       setJumlah('');
       setTanggal('');
+      setJatuhTempo('');
       setCatatan('');
       setNoHp('');
     } catch (err) {
@@ -139,6 +143,7 @@ const Dashboard: React.FC = () => {
           noHp={noHp} setNoHp={setNoHp}
           jumlah={jumlah} setJumlah={setJumlah}
           tanggal={tanggal} setTanggal={setTanggal}
+          jatuhTempo={jatuhTempo} setJatuhTempo={setJatuhTempo}
           catatan={catatan} setCatatan={setCatatan}
           onSubmit={handleSubmit}
         />

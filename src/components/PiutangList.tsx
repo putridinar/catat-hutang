@@ -9,6 +9,7 @@ interface Props {
     nama: string;
     jumlah: string;
     tanggal: string;
+    jatuhTempo: string;
   }[];
 }
 
@@ -39,6 +40,9 @@ const PiutangList: React.FC<Props> = ({ data }) => {
             </p>
             <p style={{ margin: '2px 0', color: '#666' }}>
               📅 <strong>Tanggal:</strong> {new Date(item.tanggal).toLocaleDateString('id-ID')}
+            </p>
+            <p style={{ margin: '2px 0', color: '#666' }}>
+              💥 <strong>Tempo:</strong> {new Date(item.jatuhTempo).toLocaleDateString('id-ID')}
             </p>
           </IonLabel>
           <IonIcon icon={chevronForward} slot="end" color="medium" />

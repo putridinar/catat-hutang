@@ -50,7 +50,7 @@ import {
                 />
               </IonAvatar>
               <IonCardHeader>
-                <IonCardTitle style={{ marginTop: '10px' }}>{user.displayName}</IonCardTitle>
+                <IonCardTitle style={{ marginTop: '10px' }}>{user.displayName || 'Admin'}</IonCardTitle>
                 <IonCardSubtitle>{user.email}</IonCardSubtitle>
               </IonCardHeader>
   

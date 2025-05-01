@@ -67,7 +67,7 @@ const Menu: React.FC<MenuProps> = ({ className }) => {
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
+    localStorage.removeItem('uid');
     show('Logout berhasil!', 'success');
     setTimeout(() => {
       window.location.href = '/login';
