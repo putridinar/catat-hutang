@@ -80,6 +80,14 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    setShowToast(true);
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 1500); // delay biar toast sempat tampil
+  };
+
   return (
     <IonPage>
       <IonHeader>

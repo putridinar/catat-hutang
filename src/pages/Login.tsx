@@ -18,18 +18,29 @@ const Login: React.FC = () => {
   const history = useHistory();
 
   const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      history.push('/dashboard'); // setelah login, arahkan ke dashboard
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+  
+      // Set token login
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userEmail', user.email || '');
+  
+      // Redirect ke dashboard
+      window.location.href = '/dashboard';
     } catch (error) {
-      console.error("Login gagal:", error);
+      console.error('Login Google gagal', error);
     }
   };
+  
+  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
+  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
   
   const handleLogin = async () => {
     setLoading(true);
     try {
-      if (email === 'admin@sari.amd.ak' && password === 'qwerty') {
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         window.location.href = '/dashboard';
       } else {
         throw new Error('Email atau password salah');
@@ -39,13 +50,13 @@ const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <IonPage>
       <IonContent className="login-background" fullscreen>
         <div className="login-container">
-          <img src="/assets/logo.svg" alt="Logo" className="login-logo" />
+          <img src="/sari.png" alt="Logo" className="login-logo" />
           <h1 className="login-title">Selamat Datang</h1>
           <p className="login-subtitle">Silakan login untuk melanjutkan</p>
 
@@ -67,7 +78,7 @@ const Login: React.FC = () => {
 
           <IonButton expand="block" className="login-button" onClick={handleLogin}>
             <IonIcon icon={logInOutline} slot="start" />
-            Login
+            Login Email
           </IonButton>
 		  <IonText>Atau</IonText>
       <IonButton expand="block" onClick={handleGoogleLogin} color='primary'>

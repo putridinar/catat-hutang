@@ -1,7 +1,8 @@
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonLabel, IonItem,
-  IonList, IonListHeader, IonButton, IonButtons, IonSpinner, IonAlert
+  IonIcon, IonListHeader, IonBackButton, IonButton, IonButtons, IonSpinner, IonAlert
 } from '@ionic/react';
+import { logoWhatsapp } from 'ionicons/icons';
 import { useParams, useHistory } from 'react-router';
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, doc, getDoc, deleteDoc, updateDoc, addDoc, Timestamp } from 'firebase/firestore';
@@ -13,8 +14,8 @@ const DetailHutang: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
-
-const [riwayat, setRiwayat] = useState<any[]>([]);
+  const [riwayat, setRiwayat] = useState<any[]>([]);
+  const [showWaAlert, setShowWaAlert] = useState(false);
 
 useEffect(() => {
   const fetchHistory = async () => {
@@ -92,11 +93,34 @@ useEffect(() => {
     history.push('/dashboard');
   };
 
+  const handleKirimWhatsapp = () => {
+    if (!data) return;
+  
+    const nama = data.nama;
+    const jumlah = parseInt(data.jumlah).toLocaleString('id-ID');
+    const tanggalPinjam = data.tanggal?.toDate?.() || new Date(data.tanggal);
+    const tanggalJatuhTempo = data.jatuhTempo?.toDate?.() || new Date(data.jatuhTempo);
+    const noHp = data.noHp?.replace(/^0/, '62'); // ubah 08xxx jadi 628xxx
+  
+    const pesan = `Halo ${nama},\n\nKami ingin mengingatkan mengenai pinjaman Anda sebesar Rp ${jumlah}.\n\n🗓 Tanggal Pinjam: ${tanggalPinjam.toLocaleDateString('id-ID')}\n📅 Jatuh Tempo: ${tanggalJatuhTempo.toLocaleDateString('id-ID')}\n\nSilakan lakukan pembayaran ke rekening berikut:\n\n💳 BCA - 1234567890 a/n PT. Sari AMD\n📱 DANA - 0812-xxxx-xxxx\n\nMohon konfirmasi jika sudah melakukan pembayaran. Terima kasih 🙏`;
+  
+    const url = `https://wa.me/${noHp}?text=${encodeURIComponent(pesan)}`;
+    window.open(url, '_blank');
+  };
+   
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton></IonBackButton>
+          </IonButtons>
           <IonTitle>Detail Piutang</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={() => setShowWaAlert(true)} title="Kirim tagihan WhatsApp">
+              <IonIcon slot="icon-only" icon={logoWhatsapp} />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -170,6 +194,25 @@ useEffect(() => {
           ]}
         />
       </IonContent>
+<IonAlert
+  isOpen={showWaAlert}
+  header="Konfirmasi"
+  message="Kirim penagihan hutang via WhatsApp?"
+  buttons={[
+    {
+      text: 'Batal',
+      role: 'cancel',
+      handler: () => setShowWaAlert(false),
+    },
+    {
+      text: 'Kirim',
+      handler: () => {
+        setShowWaAlert(false);
+        handleKirimWhatsapp(); // kirim pesan
+      },
+    },
+  ]}
+/>
     </IonPage>
   );
 };

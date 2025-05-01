@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { setupIonicReact } from '@ionic/react';
 import { IonApp } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { ToastProvider } from './useToast';
 import App from './App';
 
 
@@ -12,9 +13,11 @@ const root = createRoot(container!);
 root.render(
   <React.StrictMode>
     <IonApp>
-      <IonReactRouter>
-        <App />
-      </IonReactRouter>
+    <ToastProvider>
+        <IonReactRouter>
+          <App />
+        </IonReactRouter>
+      </ToastProvider>
     </IonApp>
   </React.StrictMode>
 );

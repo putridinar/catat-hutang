@@ -9,6 +9,7 @@ import Menu from './components/Menu';
 import Page from './pages/Page';
 import Login from './pages/Login';
 import Logout from './pages/Logout';
+import PrivateRoute from './components/PrivateRoute';
 import Dashboard from './pages/Dashboard';
 import DetailHutang from './pages/DetailHutang';
 import { setupIonicReact } from '@ionic/react';
@@ -54,23 +55,17 @@ const App: React.FC = () => {
     <IonApp>
       <IonReactRouter>
         <IonSplitPane contentId="main">
-          {!isLoginPage && <Menu />}
+          {!isLoginPage && <Menu className={isLoginPage ? 'hidden' : ''} />}
           <IonRouterOutlet id="main">
             <Route path="/login" exact>
-              <Login />
+              <Login style={{ minWidth: '100vw', width: '100%' }} />
             </Route>
 
-            <Route path="/dashboard" exact>
-              <Dashboard />
-            </Route>
+            <PrivateRoute path="/dashboard" component={Dashboard} />
 
-			<Route path="/detail/:id" exact>
-			  <DetailHutang />
-			</Route>
+            <PrivateRoute path="/detail/:id" component={DetailHutang} />
 
-            <Route path="/page" exact>
-              <Page />
-            </Route>
+            <PrivateRoute path="/page" component={Page} />
 
             <Route path="/" exact>
               <Redirect to="/login" />

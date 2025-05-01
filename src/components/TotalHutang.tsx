@@ -11,7 +11,7 @@ const TotalHutang: React.FC<Props> = ({ data }) => {
   return (
     <IonItem lines="full">
       <IonLabel>
-        <h2>Total Hutang</h2>
+        <h2>Total Uang Diluar</h2>
         <p style={{ fontWeight: 'bold', fontSize: '1.2em' }}>
           Rp {total.toLocaleString('id-ID')}
         </p>

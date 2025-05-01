@@ -8,7 +8,7 @@ import {
   IonMenu,
   IonMenuToggle,
 } from '@ionic/react';
-
+import { useToast } from '../useToast';
 import { useLocation } from 'react-router-dom';
 import {
   logOutOutline, logOutSharp,
@@ -18,10 +18,11 @@ import {
 import './Menu.css';
 
 interface AppPage {
+  title: string;
   url: string;
   iosIcon: string;
   mdIcon: string;
-  title: string;
+  isLogout?: boolean;
 }
 
 const appPages: AppPage[] = [
@@ -33,14 +34,25 @@ const appPages: AppPage[] = [
   },
   {
     title: 'Logout',
-    url: '/logout',
+    url: '',
     iosIcon: logOutOutline,
     mdIcon: logOutSharp,
+    isLogout: true,
   },
 ];
 
 const Menu: React.FC = () => {
   const location = useLocation();
+  const { show } = useToast(); // aman karena tidak dipanggil saat render
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userEmail');
+    show('Logout berhasil!', 'success'); // panggil toast
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 1000); // beri delay biar toast sempat tampil
+  };
 
   return (
     <IonMenu contentId="main" type="overlay">
@@ -51,9 +63,13 @@ const Menu: React.FC = () => {
           {appPages.map((appPage, index) => (
             <IonMenuToggle key={index} autoHide={false}>
               <IonItem
+                button
+                onClick={
+                  appPage.isLogout
+                    ? handleLogout
+                    : () => (window.location.href = appPage.url)
+                }
                 className={location.pathname === appPage.url ? 'selected' : ''}
-                routerLink={appPage.url}
-                routerDirection="none"
                 lines="none"
                 detail={false}
               >
