@@ -1,5 +1,6 @@
 // components/PiutangList.tsx
 import { IonList, IonItem, IonLabel, IonIcon } from '@ionic/react';
+import { Timestamp } from 'firebase/firestore';
 import { useHistory } from 'react-router-dom';
 import { chevronForward } from 'ionicons/icons';
 
@@ -15,6 +16,7 @@ interface Props {
 
 const PiutangList: React.FC<Props> = ({ data }) => {
   const history = useHistory();
+  
 
   return (
     <IonList style={{ marginTop: '16px', background: 'transparent' }}>
@@ -45,20 +47,19 @@ const PiutangList: React.FC<Props> = ({ data }) => {
               <p style={{ margin: '2px 0', color: '#666' }}>
                 💥 <strong>Tempo:</strong>{' '}
                 {(() => {
-                  const tempo = item.jatuhTempo;
-                  let tanggal: Date | null = null;
+                const tempo: any = item.jatuhTempo;
+                let tanggal: Date | null = null;
 
-                  if (tempo?.toDate) {
-                    // Firebase Timestamp
-                    tanggal = tempo.toDate();
-                  } else if (typeof tempo === 'string') {
-                    tanggal = new Date(tempo);
-                  }
+                if (tempo instanceof Timestamp) {
+                  tanggal = tempo.toDate();
+                } else if (typeof tempo === 'string') {
+                  tanggal = new Date(tempo);
+                }
 
-                  return tanggal && !isNaN(tanggal.getTime())
-                    ? tanggal.toLocaleDateString('id-ID')
-                    : 'Tanggal tidak valid';
-                })()}
+                return tanggal && !isNaN(tanggal.getTime())
+                  ? tanggal.toLocaleDateString('id-ID')
+                  : 'Tanggal tidak valid';
+              })()}
               </p>
 
           </IonLabel>

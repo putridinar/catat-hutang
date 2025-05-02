@@ -5,6 +5,7 @@ import {
   IonCardContent,
   IonFooter
 } from '@ionic/react';
+import { useToast } from '../contexts/useToast';
 import { logoWhatsapp, pencilSharp, trashSharp } from 'ionicons/icons';
 import { useParams, useHistory } from 'react-router';
 import { useEffect, useState } from 'react';
@@ -28,6 +29,7 @@ const DetailHutang: React.FC = () => {
   const [editJumlah, setEditJumlah] = useState(0);
   const [editJatuhTempo, setEditJatuhTempo] = useState('');
   const user = getAuth().currentUser;
+  const { show } = useToast();
 
 
 useEffect(() => {
@@ -162,17 +164,23 @@ useEffect(() => {
   };
 
   const handleEditSubmit = async () => {
+    setLoading(true);
     try {
       await updateDoc(doc(db, 'hutang', id), {
         nama: editNama,
         jumlah: editJumlah,
         jatuhTempo: Timestamp.fromDate(new Date(editJatuhTempo)),
       });
-      alert('Hutang diperbarui!');
+      show('Hutang berhasil diperbarui!', 'success');
       setShowEditModal(false);
     } catch (err) {
       console.error(err);
-      alert('Gagal update hutang');
+      show('Gagal update hutang', 'danger');
+    } finally {
+      setLoading(false);
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 100);
     }
   };
   
@@ -183,11 +191,14 @@ useEffect(() => {
   const handleDeleteSubmit = async () => {
     try {
       await deleteDoc(doc(db, 'hutang', id));
-      alert('Hutang berhasil dihapus!');
       history.push('/dashboard');
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 100);
+      show('Hutang berhasil dihapus!', 'success');
     } catch (err) {
       console.error('Gagal hapus hutang:', err);
-      alert('Gagal hapus hutang!');
+      show('Gagal hapus hutang!', 'danger');
     }
   };
   
