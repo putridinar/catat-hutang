@@ -92,7 +92,7 @@ const Login: React.FC<LoginProps> = ({ style }) => {
             <IonIcon icon={logInOutline} slot="start" />
             Login Email
           </IonButton>
-		   <IonText>Atau</IonText>
+		   <IonText color="white">Atau</IonText>
       <IonButton expand="block" onClick={handleGoogleLogin} color='primary'>
             <IonIcon icon={logoGoogle} slot="start" />
         Login dengan Google
